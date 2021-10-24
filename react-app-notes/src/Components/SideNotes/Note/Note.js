@@ -6,20 +6,20 @@ import { useDispatch } from "react-redux";
 
 import note from "./Note.css";
 
-export default function Note(props) {
+export default function Note({id, subtitle, title}) {
   const dispatch = useDispatch();
 
   const deleteNote = () => {
     dispatch({
       type: "DELETE_NOTE",
-      payload: props.id,
+      payload: id
     });
   };
   return (
     <li className="txt-note-prev">
       <div className="bloc-note-left">
-        <p>{props.title}</p>
-        <p>{props.subtitle}</p>
+        <p>{title}</p>
+        <p>{subtitle}</p>
       </div>
       <div className="bloc-note-right">
         <button onClick={deleteNote}>
