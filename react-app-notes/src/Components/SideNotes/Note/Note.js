@@ -6,7 +6,7 @@ import { useDispatch } from "react-redux";
 
 import note from "./Note.css";
 
-export default function Note({id, subtitle, title}) {
+export default function Note({id, title, subtitle}) {
   const dispatch = useDispatch();
 
   const deleteNote = () => {

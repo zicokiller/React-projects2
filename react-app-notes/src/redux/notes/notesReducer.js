@@ -33,6 +33,14 @@ export default function notesReducer(state = INITIAL_STATE, action) {
         notes: newNotesArr,
       }
     }
+
+    case "ADD_NOTE": {
+      const newNotesArr = [...state.notes];
+      newNotesArr.push(action.payload);
+      return {
+        notes: newNotesArr
+      }
+    }
   }
   return state;
 }
