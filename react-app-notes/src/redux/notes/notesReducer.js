@@ -25,22 +25,36 @@ const INITIAL_STATE = {
 
 export default function notesReducer(state = INITIAL_STATE, action) {
   switch (action.type) {
+    case "ADD_NOTE": {
+      const newNotesArr = [...state.notes];
+      newNotesArr.push(action.payload);
+      return {
+        notes: newNotesArr,
+      };
+    }
+
+    case "UPDATE_NOTE": {
+      const newNotesArr = [...state.notes];
+      const newObj = action.payload;
+
+      const index = newNotesArr.findIndex((obj) => obj.id === newObj.id);
+      newNotesArr.splice(index, 1, newObj);
+
+      return {
+        notes: newNotesArr,
+      };
+    }
+
     case "DELETE_NOTE": {
       const newNotesArr = [...state.notes].filter(
         (note) => note.id !== action.payload
       );
       return {
         notes: newNotesArr,
-      }
-    }
-
-    case "ADD_NOTE": {
-      const newNotesArr = [...state.notes];
-      newNotesArr.push(action.payload);
-      return {
-        notes: newNotesArr
-      }
+      };
     }
   }
   return state;
 }
+
+

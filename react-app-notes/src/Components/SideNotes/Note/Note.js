@@ -6,28 +6,39 @@ import { useDispatch } from "react-redux";
 
 import note from "./Note.css";
 
-export default function Note({id, title, subtitle}) {
+export default function Note(props) {
   const dispatch = useDispatch();
+
+  const modifyNote = () => {
+    dispatch({
+      type: "VISUALIZE_NOTE",
+      payload: props, 
+    });
+  };
 
   const deleteNote = () => {
     dispatch({
       type: "DELETE_NOTE",
-      payload: id
+      payload: props.id,
     });
+
+    
   };
   return (
     <li className="txt-note-prev">
       <div className="bloc-note-left">
-        <p>{title}</p>
-        <p>{subtitle}</p>
+        <p>{props.title}</p>
+        <p>{props.subtitle}</p>
       </div>
       <div className="bloc-note-right">
         <button onClick={deleteNote}>
           <img src={delIcon} alt="delete icon" />
         </button>
-        <button>
-          <img src={edit} alt="edit icon" />
-        </button>
+        <Link to="/edit">
+          <button onClick={modifyNote}>
+            <img src={edit} alt="edit icon" />
+          </button>
+        </Link>
       </div>
     </li>
   );

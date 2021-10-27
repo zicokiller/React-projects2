@@ -5,11 +5,25 @@ import { v4 as uuiv4 } from "uuid";
 import "./MainArea.css";
 
 export default function MainArea() {
+  // Hook pour créer une note
   const [inpInfo, setInpInfo] = useState({
     title: "",
     subtitle: "",
     body: "",
   });
+
+  // Hook pour modifier une note (edit)
+  const [inpModify, setInpModify] = useState({
+    title: "",
+    subtitle: "",
+    body: "",
+  });
+
+  const selected = useSelector((state) => state.selectedReducer.selectedNote);
+
+  useEffect(() => {
+    setInpModify(selected);
+  }, [selected]);
 
   const dispatch = useDispatch();
 
@@ -25,39 +39,69 @@ export default function MainArea() {
     }
   };
 
-  const handleForm = (e) => {
-    e.preventDefault();
-    if (inpInfo.title.length < 1) {
-      setValidation(false);
-      return;
-    }
-    setValidation(true);
-
-    dispatch({
-      type: "ADD_NOTE",
-      payload: {
-        ...inpInfo,
-        id: uuiv4() // Un 'id' sera crée sur chaque new note
-      } 
-    });
-
-    /* Ici, je remets les inputs à zéro une fois la note enregistrée */
-    setInpInfo({
-      title: "",
-      subtitle: "",
-      body: ""
-    })
-  };
-
   const updateInputs = (e) => {
     /* Ici, je target tous les 'id' correspondant 
-       aux inputs ('title', 'subtitle', 'body')  */
+       aux inputs ('title', 'subtitle', 'body') */
     const actualInp = e.target.getAttribute("id");
 
-    /* Et je balance une copie de  'inpInfo' (state précédent) 
-       + 'actualInp' avec les nouvelles valeurs des 3 inputs */
-    const newObjState = {...inpInfo, [actualInp]: e.target.value};
+    /* Pour une note modifiée, j'envoie une copie de 'inpModify' 
+       + 'actualInp' avec les nouvelles valeurs */
+    if (selected.toggle) {
+      const newObjState = { ...inpModify, [actualInp]: e.target.value };
+      setInpModify(newObjState);
+    } else if (selected.toggle === false) {
+      /* Sinon j'envoie une copie de 'inpInfo' (state précédent) 
+       + 'actualInp' pour créer une nouvelle note */
+      const newObjState = { ...inpInfo, [actualInp]: e.target.value };
       setInpInfo(newObjState);
+    }
+  };
+
+  const handleForm = (e) => {
+    e.preventDefault();
+    /* Ici, je modifie une note existante */
+    if (selected.toggle) {
+      if (selected.title.length < 1) {
+        setValidation(false);
+        return;
+      }
+      setValidation(true);
+
+      dispatch({
+        type: "UPDATE_NOTE",
+        payload: inpModify,
+      });
+      dispatch({
+        type: "RESET_NOTE",
+      });
+      setInpModify({
+        title: "",
+        subtitle: "",
+        body: "",
+      });
+    } else if (selected.toggle === false) {
+      /* sinon je crée une nouvelle note */
+      if (inpInfo.title.length < 1) {
+        setValidation(false);
+        return;
+      }
+      setValidation(true);
+
+      dispatch({
+        type: "ADD_NOTE",
+        payload: {
+          ...inpInfo,
+          id: uuiv4(), // Un 'id' sera crée sur chaque new note
+        },
+      });
+
+      /* Ici, je remets les inputs à zéro une fois la note enregistrée */
+      setInpInfo({
+        title: "",
+        subtitle: "",
+        body: "",
+      });
+    }
   };
 
   return (
@@ -67,7 +111,10 @@ export default function MainArea() {
       <form onSubmit={handleForm}>
         <label htmlFor="title">Titre</label>
         <input
-          value={inpInfo.title}
+          value={
+            inpModify.toggle ? inpModify.title : inpInfo.title
+          } /* est-ce que 'inpModify.toggle' est 'true'?, si oui
+          j'encoie 'inpModify.title' Si non, j'envoie 'inpInfo.title' */
           onChange={updateInputs}
           ref={addInp}
           type="text"
@@ -75,29 +122,21 @@ export default function MainArea() {
         />
 
         {!validation && (
-          <span className="info-validation">
-            Veuillez renseigner un titre
-          </span>
+          <span className="info-validation">Veuillez renseigner un titre</span>
         )}
 
         <label htmlFor="subtitle">Sous-titre</label>
         <input
-          value={inpInfo.subtitle}
+          value={inpModify.toggle ? inpModify.subtitle : inpInfo.subtitle}
           onChange={updateInputs}
           ref={addInp}
           type="text"
           id="subtitle"
         />
 
-        {/* {!validation && (
-          <span className="info-validation">
-            Veuillez renseigner un sous-titre
-          </span>
-        )} */}
-
         <label htmlFor="body">Votre Note</label>
         <textarea
-          value={inpInfo.body}
+          value={inpModify.toggle ? inpModify.body : inpInfo.body}
           onChange={updateInputs}
           ref={addInp}
           id="body"
@@ -108,3 +147,5 @@ export default function MainArea() {
     </div>
   );
 }
+
+
