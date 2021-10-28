@@ -21,7 +21,7 @@ export default function selectedReducer(state = INITIAL_STATE, action) {
       };
     
 
-    case "RESET_NOTE": 
+    case "RESET_MODIFY_NOTE": 
       return {
         selectedNote: {
         title: "",

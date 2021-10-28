@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { v4 as uuiv4 } from "uuid";
 
@@ -19,6 +19,8 @@ export default function MainArea() {
     body: "",
   });
 
+  /* sert à selectionner le state ('true' ou 'false') pour savoir 
+     si on est en train de modifier une note ou pas */
   const selected = useSelector((state) => state.selectedReducer.selectedNote);
 
   useEffect(() => {
@@ -28,16 +30,6 @@ export default function MainArea() {
   const dispatch = useDispatch();
 
   const [validation, setValidation] = useState(true); // passera à false si le form est mal rempli
-
-  const allInp = useRef([]);
-
-  /* Func call chaque x que je veux la ref d'un élément */
-  const addInp = (el) => {
-    /* if = est-ce-que 'el' existe et (&&) n'est pas (!) présent ds 'allInp' */
-    if (el && !allInp.current.includes(el)) {
-      allInp.current.push(el); /* si pas présent alors l'élément est ajouté */
-    }
-  };
 
   const updateInputs = (e) => {
     /* Ici, je target tous les 'id' correspondant 
@@ -72,7 +64,7 @@ export default function MainArea() {
         payload: inpModify,
       });
       dispatch({
-        type: "RESET_NOTE",
+        type: "RESET_MODIFY_NOTE",
       });
       setInpModify({
         title: "",
@@ -111,12 +103,9 @@ export default function MainArea() {
       <form onSubmit={handleForm}>
         <label htmlFor="title">Titre</label>
         <input
-          value={
-            inpModify.toggle ? inpModify.title : inpInfo.title
-          } /* est-ce que 'inpModify.toggle' est 'true'?, si oui
-          j'encoie 'inpModify.title' Si non, j'envoie 'inpInfo.title' */
+          value={inpModify.toggle ? inpModify.title : inpInfo.title} /* SI 'inpModify.toggle' est 'true'?, si oui
+          j'envoie 'inpModify.title'. SINON, j'envoie 'inpInfo.title' */
           onChange={updateInputs}
-          ref={addInp}
           type="text"
           id="title"
         />
@@ -129,7 +118,6 @@ export default function MainArea() {
         <input
           value={inpModify.toggle ? inpModify.subtitle : inpInfo.subtitle}
           onChange={updateInputs}
-          ref={addInp}
           type="text"
           id="subtitle"
         />
@@ -138,7 +126,6 @@ export default function MainArea() {
         <textarea
           value={inpModify.toggle ? inpModify.body : inpInfo.body}
           onChange={updateInputs}
-          ref={addInp}
           id="body"
           placeholder="votre texte..."
         ></textarea>
